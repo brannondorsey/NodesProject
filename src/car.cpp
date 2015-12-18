@@ -123,7 +123,7 @@ void car::display() {
     ofTranslate(location.x,location.y);
     ofRotate(-theta);
     
-    ofSetColor(50,50,50,175);
+    ofSetColor(80,80,80,175);
     ofBeginShape();
     ofVertex(0, r*2);
     ofVertex(-r, -r*2);
