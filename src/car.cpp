@@ -8,10 +8,11 @@
 #include "ofApp.h"
 #include "car.h"
 
-car::car(float x, float y) {
+car::car(ofVec2f start, ofVec2f target) {
     acceleration = ofVec2f(0,0);
-    velocity = ofVec2f(0,-2);
-    location = ofVec2f(x,y);
+    velocity = ofVec2f(ofRandom(-2, 2) ,ofRandom(-2, 2));
+    location = start;
+    targetLoc = target;
     r = 2.0;
     targetDistance = r * 10.0;
     targetRadius = r * 4.0;
@@ -19,7 +20,7 @@ car::car(float x, float y) {
     alphaTargetAngle = 15.0;        // maximum change in angle each frame (in + and - direction, so max change actually double this)
     targetRelative = ofVec2f(0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
     maxspeed = 4.0;
-    maxforce = ofRandom(.1,.4);
+    maxforce = ofRandom(.2,.4);
     arriveRadius = 10.0;
     col = ofColor(ofRandom(220,250),ofRandom(180,250), ofRandom(180,250));
     life = true;
@@ -37,7 +38,7 @@ void car::update() {
     }
 }
 
-void car::wander(ofVec2f mousePos) {
+void car::wander() {
     // These two lines introduce a slight modification to Daniel Shiffman's example, to alter the radius and
     // distance of the target zone depending on mouse position
     //targetDistance = ofMap(mousePos.x,0,ofGetWidth(),0,100);
@@ -79,8 +80,8 @@ void car::applyForce(ofVec2f force) {
 
 // A method that calculates a steering force towards a target
 // STEER = DESIRED MINUS VELOCITY
-void car::seek(ofVec2f target) {
-    ofVec2f desired = target - location;
+void car::seek() {
+    ofVec2f desired = targetLoc - location;
     desired.normalize();
     desired *= maxspeed;
     ofVec2f steer = desired - velocity;
@@ -90,13 +91,13 @@ void car::seek(ofVec2f target) {
 
 // A method that calculates a steering force towards a target
 // STEER = DESIRED MINUS VELOCITY
-void car::arrive(ofVec2f target) {
-    ofVec2f desired = target - location;
+void car::arrive() {
+    ofVec2f desired = targetLoc - location;
     float d = desired.length();
     desired.normalize();
     if (d < arriveRadius) {
-        float m = ofMap(d,0,arriveRadius,0,maxspeed);
-        desired *= m;
+        //float m = ofMap(d,0,arriveRadius,0,maxspeed);
+        //desired *= m;
         life = false;
     } else {
         desired *= maxspeed;

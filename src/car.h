@@ -16,13 +16,13 @@ public:
     vector<ofVec2f> history;
     
     car() {}
-    car(float x, float y);
+    car(ofVec2f start, ofVec2f target);
     
     void update();
-    void wander(ofVec2f mousePos);
+    void wander();
     void applyForce(ofVec2f force);
-    void seek(ofVec2f target);
-    void arrive(ofVec2f target);
+    void seek();
+    void arrive();
     void display();
     bool life;
     
@@ -32,6 +32,7 @@ private:
     ofVec2f velocity;
     ofVec2f acceleration;
     ofVec2f targetRelative;
+    ofVec2f targetLoc;
     
     float r;
     float maxforce;

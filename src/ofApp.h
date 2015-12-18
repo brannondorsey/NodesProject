@@ -25,8 +25,8 @@ class ofApp : public ofBaseApp{
     private:
         vector<car> cars;
         vector<ofVec2f> nodes;
-        vector<ofVec2f> targets;
-        void spawn(ofVec2f node);
+        //vector<ofVec2f> targets;
+        void spawn();
     
     
 		

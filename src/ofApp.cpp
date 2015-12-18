@@ -2,15 +2,17 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    for(int i = 0; i<500; i++) {
-        car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
-        cars.push_back(tempV);
-    }
-    
-    for(int i = 0; i<10; i++) {
+    for(int i = 0; i<20; i++) {
         ofVec2f newNode = ofVec2f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()));
         nodes.push_back(newNode);
     }
+    
+//    for(int i = 0; i<500; i++) {
+//        car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
+//        cars.push_back(tempV);
+//    }
+    
+
     
 }
 
@@ -20,8 +22,8 @@ void ofApp::update(){
     
     // Call the appropriate steering behaviors for our agents
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
-        (*it).wander(nodes[0]);
-        (*it).arrive(nodes[0]);
+        (*it).wander();
+        (*it).arrive();
         (*it).update();
         if (!(*it).life) {
             cars.erase(it);
@@ -44,19 +46,41 @@ void ofApp::draw(){
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).display();
     }
+    ofFill();
+    ofSetColor(200);
+    for(std::vector<ofVec2f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
+        ofDrawCircle((*it).x, (*it).y, 4);
+    }
+    ofSetColor(255);
+    ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 10, 15);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
     if (key==32 ) {
-        for(int i = 0; i<500; i++) {
-            car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
-            cars.push_back(tempV);
-        }
+        spawn();
         //node = ofVec2f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()));
     }
 }
+
+//--------------------------------------------------------------
+void ofApp::spawn(){
+    int traffic = ofRandom(30, 100);
+    int startNode = ofRandom(nodes.size());
+    int targetNode = ofRandom(nodes.size());
+    while (startNode==targetNode) {
+        targetNode = ofRandom(nodes.size());
+    }
+    
+    for(int i = 0; i<traffic; i++) {
+        car tempV = car(nodes[startNode], nodes[targetNode]);
+        cars.push_back(tempV);
+    }
+}
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
