@@ -22,7 +22,10 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    vector<car> cars;
+    private:
+        vector<car> cars;
+        ofVec2f node;
+    
     
 		
 };

@@ -2,10 +2,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    for(int i = 0; i<1000; i++) {
+    for(int i = 0; i<500; i++) {
         car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
         cars.push_back(tempV);
     }
+    node = ofVec2f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()));
 }
 
 //--------------------------------------------------------------
@@ -14,9 +15,13 @@ void ofApp::update(){
     
     // Call the appropriate steering behaviors for our agents
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
-        (*it).wander(mouse);
-        (*it).arrive(mouse);
+        (*it).wander(node);
+        (*it).arrive(node);
         (*it).update();
+        if (!(*it).life) {
+            cars.erase(it);
+            --it;
+        }
     }
 }
 
@@ -29,7 +34,7 @@ void ofApp::draw(){
     ofSetColor(200);
  //   stroke(0);
 //    strokeWeight(2);
-    ofDrawCircle(mouseX, mouseY, 48, 48);
+    //ofDrawCircle(mouseX, mouseY, 48, 48);
     
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).display();
@@ -39,6 +44,13 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
+    if (key==32 ) {
+        for(int i = 0; i<500; i++) {
+            car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
+            cars.push_back(tempV);
+        }
+        node = ofVec2f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()));
+    }
 }
 
 //--------------------------------------------------------------

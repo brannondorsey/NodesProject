@@ -24,6 +24,7 @@ public:
     void seek(ofVec2f target);
     void arrive(ofVec2f target);
     void display();
+    bool life;
     
 private:
     

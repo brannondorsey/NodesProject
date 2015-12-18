@@ -22,6 +22,7 @@ car::car(float x, float y) {
     maxforce = ofRandom(.1,.4);
     arriveRadius = 10.0;
     col = ofColor(ofRandom(220,250),ofRandom(180,250), ofRandom(180,250));
+    life = true;
 }
 
 void car::update() {
@@ -96,6 +97,7 @@ void car::arrive(ofVec2f target) {
     if (d < arriveRadius) {
         float m = ofMap(d,0,arriveRadius,0,maxspeed);
         desired *= m;
+        life = false;
     } else {
         desired *= maxspeed;
     }
@@ -121,7 +123,7 @@ void car::display() {
     ofTranslate(location.x,location.y);
     ofRotate(-theta);
     
-    ofSetColor(0,0,0,175);
+    ofSetColor(50,50,50,175);
     ofBeginShape();
     ofVertex(0, r*2);
     ofVertex(-r, -r*2);
