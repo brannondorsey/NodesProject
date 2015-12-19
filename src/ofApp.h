@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGui.h"
 #include "car.h"
 
 class ofApp : public ofBaseApp{
@@ -21,6 +22,9 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    
+        ofxPanel gui;
+        ofxFloatSlider maxSpd;
     
     private:
         vector<car> cars;

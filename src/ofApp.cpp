@@ -12,7 +12,8 @@ void ofApp::setup(){
 //        cars.push_back(tempV);
 //    }
     
-
+    gui.setup();
+    gui.add(maxSpd.setup("maximum speed", 4, .1, 8));
     
 }
 
@@ -24,7 +25,7 @@ void ofApp::update(){
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).wander();
         (*it).arrive();
-        (*it).update();
+        (*it).update(maxSpd);
         if (!(*it).life) {
             cars.erase(it);
             --it;
@@ -53,6 +54,8 @@ void ofApp::draw(){
     }
     ofSetColor(255);
     ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 10, 15);
+    
+    gui.draw();
 }
 
 //--------------------------------------------------------------

@@ -26,7 +26,8 @@ car::car(ofVec2f start, ofVec2f target) {
     life = true;
 }
 
-void car::update() {
+void car::update(int maxSpd) {
+    maxspeed = maxSpd;
     velocity += acceleration;
     velocity.limit(maxspeed);
     location += velocity;
