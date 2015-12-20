@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    for(int i = 0; i<20; i++) {
+    for(int i = 0; i<50; i++) {
         ofVec2f newNode = ofVec2f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()));
         nodes.push_back(newNode);
     }
@@ -13,19 +13,18 @@ void ofApp::setup(){
 //    }
     
     gui.setup();
-    gui.add(maxSpd.setup("maximum speed", 4, .1, 8));
+    gui.add(maxSpd.setup("maximum speed", 1.5, .1, 8));
+    gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    ofVec2f mouse = ofVec2f(mouseX, mouseY);
-    
     // Call the appropriate steering behaviors for our agents
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).wander();
         (*it).arrive();
-        (*it).update(maxSpd);
+        (*it).update(maxSpd, alphaTagetAng);
         if (!(*it).life) {
             cars.erase(it);
             --it;
@@ -53,8 +52,8 @@ void ofApp::draw(){
         ofDrawCircle((*it).x, (*it).y, 4);
     }
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 10, 15);
-    
+    ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 250, 15);
+
     gui.draw();
 }
 
@@ -69,7 +68,7 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::spawn(){
-    int traffic = ofRandom(30, 100);
+    int traffic = ofRandom(10, 40);
     int startNode = ofRandom(nodes.size());
     int targetNode = ofRandom(nodes.size());
     while (startNode==targetNode) {

@@ -18,7 +18,7 @@ public:
     car() {}
     car(ofVec2f start, ofVec2f target);
     
-    void update(int maxSpd);
+    void update(int maxSpd, int alphaTagetAng);
     void wander();
     void applyForce(ofVec2f force);
     void seek();

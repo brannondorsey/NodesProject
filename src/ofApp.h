@@ -25,6 +25,7 @@ class ofApp : public ofBaseApp{
     
         ofxPanel gui;
         ofxFloatSlider maxSpd;
+        ofxFloatSlider alphaTagetAng;
     
     private:
         vector<car> cars;

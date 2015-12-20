@@ -16,18 +16,19 @@ car::car(ofVec2f start, ofVec2f target) {
     r = 2.0;
     targetDistance = r * 10.0;
     targetRadius = r * 4.0;
-    currentTargetAngle = 45;        // current angle we're heading towards, calculated each frame
-    alphaTargetAngle = 15.0;        // maximum change in angle each frame (in + and - direction, so max change actually double this)
+    currentTargetAngle = ofRandom(360);        // current angle we're heading towards, calculated each frame
+    alphaTargetAngle = 25.0;        // maximum change in angle each frame (in + and - direction, so max change actually double this)
     targetRelative = ofVec2f(0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
     maxspeed = 4.0;
-    maxforce = ofRandom(.2,.4);
+    maxforce = ofRandom(.02,.1);
     arriveRadius = 10.0;
     col = ofColor(ofRandom(220,250),ofRandom(180,250), ofRandom(180,250));
     life = true;
 }
 
-void car::update(int maxSpd) {
+void car::update(int maxSpd, int alphaTagetAng) {
     maxspeed = maxSpd;
+    alphaTargetAngle = alphaTagetAng;
     velocity += acceleration;
     velocity.limit(maxspeed);
     location += velocity;
@@ -42,17 +43,22 @@ void car::update(int maxSpd) {
 void car::wander() {
     // These two lines introduce a slight modification to Daniel Shiffman's example, to alter the radius and
     // distance of the target zone depending on mouse position
-    //targetDistance = ofMap(mousePos.x,0,ofGetWidth(),0,100);
-    //targetRadius = ofMap(mousePos.y,0,ofGetHeight(),100,0);
+    float dist = ofDist(location.x, location.y, targetLoc.x, targetLoc.y);
+    targetDistance = ofMap(dist,0,ofGetWidth(),0,30); //vary distance of target wander steering with distance to target
+    targetRadius = ofMap(dist,0,ofGetWidth(),100,5);
     
-    float angleAdjust = ofRandom(-alphaTargetAngle, alphaTargetAngle);
-    currentTargetAngle += angleAdjust;
+    float angleAdjust = ofRandom(-alphaTargetAngle, alphaTargetAngle); //random new agle change
+    currentTargetAngle += angleAdjust; //added to old angle
     
     float xTarget = targetRadius * cos(ofDegToRad(currentTargetAngle));
-    float yTarget = targetRadius * sin(ofDegToRad(currentTargetAngle));
+    float yTarget = targetRadius * sin(ofDegToRad(currentTargetAngle)); //get our wander vector
     
-   // targetRelative = ofVec2f(xTarget,yTarget + targetDistance);
-    targetRelative = ofVec2f(xTarget,yTarget);
+    ofVec2f offset = velocity;
+    offset.normalize();
+    offset*=targetDistance;
+    
+    targetRelative = ofVec2f(xTarget,yTarget)+ offset;
+    //targetRelative = ofVec2f(xTarget,yTarget);
     
     ofVec2f desired = targetRelative;
     
@@ -60,7 +66,7 @@ void car::wander() {
     desired *= maxspeed;
     ofVec2f steer = desired - velocity;
     steer.limit(maxforce);
-    applyForce(steer);
+    applyForce(steer*1.1);
     
 //    if(location.x < 0 ) {
 //        location.x = ofGetWidth();
