@@ -11,6 +11,13 @@ void ofApp::setup(){
 //        car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
 //        cars.push_back(tempV);
 //    }
+    wide = ofGetWidth();
+    high = ofGetHeight();
+    for (int x=0; x<wide ; x++) {
+        for (int y = 0; y<high; y++) {
+            noises.push_back(int(255*ofNoise(x, y, ofGetFrameNum())));
+        }
+    }
     
     gui.setup();
     gui.add(maxSpd.setup("maximum speed", 1.5, .1, 8));
@@ -22,7 +29,7 @@ void ofApp::setup(){
 void ofApp::update(){
     // Call the appropriate steering behaviors for our agents
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
-        (*it).wander();
+        (*it).wander(&noises);
         (*it).arrive();
         (*it).update(maxSpd, alphaTagetAng);
         if (!(*it).life) {
@@ -30,12 +37,31 @@ void ofApp::update(){
             --it;
         }
     }
+    int frame = ofGetFrameNum();
+    if(frame%10==0){
+    for (int x=0; x<wide ; x+=4) {
+        for (int y = 0; y<high; y+=4) {
+            noises[y+high*x]=int(255*ofNoise(x/500.0, y/500.0, frame/300.0));
+        }
+    }
+    }
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(0);
     
+//    int frame = ofGetFrameNum();
+//    if(frame%10==0){
+//        for (int x=0; x<wide ; x+=4) {
+//            for (int y = 0; y<high; y+=4) {
+//                ofSetColor(noises[y+high*x]);
+//                ofDrawRectangle(x, y, 4, 4);
+//            }
+//        }
+//    }
+
     // Draw an ellipse at the mouse location
     ofFill();
     ofSetColor(200);

@@ -23,9 +23,14 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
+    int wide;
+    int high;
+    
         ofxPanel gui;
         ofxFloatSlider maxSpd;
         ofxFloatSlider alphaTagetAng;
+    
+    vector<int> noises;
     
     private:
         vector<car> cars;

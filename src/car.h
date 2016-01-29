@@ -13,13 +13,11 @@
 class car {
 public:
     
-    vector<ofVec2f> history;
-    
     car() {}
     car(ofVec2f start, ofVec2f target);
     
     void update(int maxSpd, int alphaTagetAng);
-    void wander();
+    void wander(vector<int>* noises);
     void applyForce(ofVec2f force);
     void seek();
     void arrive();
@@ -34,6 +32,9 @@ private:
     ofVec2f targetRelative;
     ofVec2f targetLoc;
     
+    ofMesh trail;
+    
+    int high;
     float r;
     float maxforce;
     float maxspeed;
@@ -43,6 +44,7 @@ private:
     float targetRadius;
     float alphaTargetAngle;
     float currentTargetAngle;
+    int age;
     ofColor col;
     
 };
