@@ -8,13 +8,12 @@
 #include "ofApp.h"
 #include "car.h"
 
-car::car(ofVec2f start, ofVec2f target) {
+car::car(ofVec3f start, ofVec3f target, int num) {
     acceleration = ofVec2f(0,0);
     velocity = ofVec2f(ofRandom(-2, 2) ,ofRandom(-2, 2));
     location = start;
     targetLoc = target;
     r = 2.0;
-    age = 0;
     targetDistance = r * 10.0;
     targetRadius = r * 4.0;
     currentTargetAngle = ofRandom(360);        // current angle we're heading towards, calculated each frame
@@ -23,12 +22,11 @@ car::car(ofVec2f start, ofVec2f target) {
     maxspeed = 4.0;
     maxforce = ofRandom(.02,.1);
     arriveRadius = 10.0;
-    col = ofColor(ofRandom(220,250),ofRandom(180,250), ofRandom(180,250));
+
     life = true;
     high = ofGetHeight();
+    leadVert = (num*2)-1;
     
-    trail.setMode(OF_PRIMITIVE_LINES);
-    trail.enableIndices();
 }
 
 void car::update(int maxSpd, int alphaTagetAng) {
@@ -41,15 +39,15 @@ void car::update(int maxSpd, int alphaTagetAng) {
 
 }
 
-void car::wander(vector<int>* noises) {
+void car::wander() {
     // These two lines introduce a slight modification to Daniel Shiffman's example, to alter the radius and
     // distance of the target zone depending on mouse position
     float dist = ofDist(location.x, location.y, targetLoc.x, targetLoc.y);
     targetDistance = ofMap(dist,0,ofGetWidth(),0,30); //vary distance of target wander steering with distance to target
     targetRadius = ofMap(dist,0,ofGetWidth(),100,5);
     
-    //float angleAdjust = ofRandom(-alphaTargetAngle, alphaTargetAngle); //random new angle change
-    float angleAdjust = alphaTargetAngle*(((*noises)[location.x*high+location.y]/255.0)-0.5);
+    float angleAdjust = ofRandom(-alphaTargetAngle, alphaTargetAngle); //random new angle change
+    //float angleAdjust = alphaTargetAngle*(((*noises)[location.x*high+location.y]/255.0)-0.5);
     currentTargetAngle += angleAdjust; //added to old angle
     
     float xTarget = targetRadius * cos(ofDegToRad(currentTargetAngle));
@@ -70,26 +68,7 @@ void car::wander(vector<int>* noises) {
     steer.limit(maxforce);
     applyForce(steer*1.1);
 
-    trail.addColor(col);
-    trail.addVertex(ofVec3f(location.x, location.y, 0.0));
-    
-    int trailLen = trail.getNumVertices();
-    
-    if(trailLen>2) {
-        trail.addIndex(trailLen-2);
-        trail.addIndex(trailLen-1);
-    }
-    
-    if (trail.getNumVertices()>1000) {
-        trail.removeVertex(0);
-        trail.removeIndex(0);
-        trail.removeIndex(0);
-        trail.removeColor(0);
-    }
-    
-    for(int i = 0; i<trailLen; i++) {
-        trail.setColor(i, ofColor(col.r, col.g, col.b, i/4));
-    }
+
 }
 
 void car::applyForce(ofVec2f force) {
@@ -99,17 +78,8 @@ void car::applyForce(ofVec2f force) {
 
 // A method that calculates a steering force towards a target
 // STEER = DESIRED MINUS VELOCITY
-void car::seek() {
-    ofVec2f desired = targetLoc - location;
-    desired.normalize();
-    desired *= maxspeed;
-    ofVec2f steer = desired - velocity;
-    steer.limit(maxforce);
-    applyForce(steer);
-}
 
-// A method that calculates a steering force towards a target
-// STEER = DESIRED MINUS VELOCITY
+
 void car::arrive() {
     ofVec2f desired = targetLoc - location;
     float d = desired.length();
@@ -130,8 +100,6 @@ void car::display() {
     
 
     //ofNoFill();
-    
-    trail.draw();
     
     float theta = velocity.angle(ofVec2f(0,1));
     ofFill();

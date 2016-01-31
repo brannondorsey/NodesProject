@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "car.h"
+#include "cluster.h"
 
 class ofApp : public ofBaseApp{
 
@@ -33,8 +34,9 @@ class ofApp : public ofBaseApp{
     vector<int> noises;
     
     private:
-        vector<car> cars;
-        vector<ofVec2f> nodes;
+    
+        vector<cluster> clusters;
+        vector<ofVec3f> nodes;
         //vector<ofVec2f> targets;
         void spawn();
     
