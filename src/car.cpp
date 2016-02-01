@@ -9,16 +9,16 @@
 #include "car.h"
 
 car::car(ofVec3f start, ofVec3f target, int num) {
-    acceleration = ofVec2f(0,0);
-    velocity = ofVec2f(ofRandom(-2, 2) ,ofRandom(-2, 2));
+    acceleration = ofVec3f(0,0, 0);
+    float vel = 1.25;
+    velocity = ofVec3f(ofRandom(-vel, vel) ,ofRandom(-vel, vel), ofRandom(-vel, vel));
     location = start;
     targetLoc = target;
     r = 2.0;
     targetDistance = r * 10.0;
     targetRadius = r * 4.0;
-    currentTargetAngle = ofRandom(360);        // current angle we're heading towards, calculated each frame
     alphaTargetAngle = 25.0;        // maximum change in angle each frame (in + and - direction, so max change actually double this)
-    targetRelative = ofVec2f(0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
+    targetRelative = ofVec3f(0,0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
     maxspeed = 4.0;
     maxforce = ofRandom(.02,.1);
     arriveRadius = 10.0;
@@ -27,6 +27,9 @@ car::car(ofVec3f start, ofVec3f target, int num) {
     high = ofGetHeight();
     leadVert = (num*2)-1;
     
+    frequency = 0.8;
+    timeFrequency = .3;
+    gridSize = 7.0;
 }
 
 void car::update(int maxSpd, int alphaTagetAng) {
@@ -40,38 +43,38 @@ void car::update(int maxSpd, int alphaTagetAng) {
 }
 
 void car::wander() {
-    // These two lines introduce a slight modification to Daniel Shiffman's example, to alter the radius and
-    // distance of the target zone depending on mouse position
-    float dist = ofDist(location.x, location.y, targetLoc.x, targetLoc.y);
-    targetDistance = ofMap(dist,0,ofGetWidth(),0,30); //vary distance of target wander steering with distance to target
-    targetRadius = ofMap(dist,0,ofGetWidth(),100,5);
+
+    float time = ofGetElapsedTimef();
+    float noiseTime = time * timeFrequency;
     
-    float angleAdjust = ofRandom(-alphaTargetAngle, alphaTargetAngle); //random new angle change
-    //float angleAdjust = alphaTargetAngle*(((*noises)[location.x*high+location.y]/255.0)-0.5);
-    currentTargetAngle += angleAdjust; //added to old angle
+    ofVec3f extentMin( 0, 0, gridSize*-0.5 );
+    ofVec3f extentMax( gridSize, gridSize, gridSize *  0.5 );
     
-    float xTarget = targetRadius * cos(ofDegToRad(currentTargetAngle));
-    float yTarget = targetRadius * sin(ofDegToRad(currentTargetAngle)); //get our wander vector
+    ofVec3f pos;
     
-    ofVec2f offset = velocity;
-    offset.normalize();
-    offset*=targetDistance;
+    pos.x = ofMap( location.x,  0, 2000, extentMin.x, extentMax.x );
+    pos.y = ofMap( location.y,  0, 2000, extentMin.y, extentMax.y );
+    pos.z = ofMap( location.z,  -1000, 1000, extentMin.z, extentMax.z );
     
-    targetRelative = ofVec2f(xTarget,yTarget)+ offset;
-    //targetRelative = ofVec2f(xTarget,yTarget);
+    ofVec3f noisePos = pos * frequency;
     
-    ofVec2f desired = targetRelative;
+    ofVec3f vel;
+    vel.x = ofSignedNoise( noisePos.x, noisePos.y, noisePos.z, noiseTime );
+    vel.y = ofSignedNoise( noiseTime,  noisePos.z, noisePos.y, noisePos.x );
+    vel.z = ofSignedNoise( noisePos.z, noiseTime,  noisePos.y, noisePos.x );
+    
+    ofVec3f desired = vel;
     
     desired.normalize();
     desired *= maxspeed;
-    ofVec2f steer = desired - velocity;
+    ofVec3f steer = desired - velocity;
     steer.limit(maxforce);
-    applyForce(steer*1.1);
+    applyForce(steer*0.9);
 
 
 }
 
-void car::applyForce(ofVec2f force) {
+void car::applyForce(ofVec3f force) {
     // We could add mass here if we want A = F / M
     acceleration+=force;
 }
@@ -81,7 +84,7 @@ void car::applyForce(ofVec2f force) {
 
 
 void car::arrive() {
-    ofVec2f desired = targetLoc - location;
+    ofVec3f desired = targetLoc - location;
     float d = desired.length();
     desired.normalize();
     if (d < arriveRadius) {
@@ -91,7 +94,7 @@ void car::arrive() {
     } else {
         desired *= maxspeed;
     }
-    ofVec2f steer = desired - velocity;
+    ofVec3f steer = desired - velocity;
     steer.limit(maxforce);
     applyForce(steer);
 }
@@ -99,30 +102,46 @@ void car::arrive() {
 void car::display() {
     
 
-    //ofNoFill();
+    ofNoFill();
     
-    float theta = velocity.angle(ofVec2f(0,1));
-    ofFill();
+    float theta = velocity.angle(ofVec3f(1,0,0));
+    float theta2 = velocity.angle(ofVec3f(0,1,0));
+    //ofFill();
     ofPushMatrix();
-    ofTranslate(location.x,location.y);
-    ofRotate(-theta);
+    ofTranslate(location.x,location.y, location.z);
+    ofRotate(-theta, 0, 0, 1);
+    //ofRotate(theta2, 0, 0, 0);
     
-    ofSetColor(80,80,80,175);
+    ofPushStyle();
+    ofSetColor(250,50,50,75);
     ofBeginShape();
-    ofVertex(0, r*2);
-    ofVertex(-r, -r*2);
-    ofVertex(r, -r*2);
+    ofVertex(-15, 0);
+    ofVertex(20, 0);
     ofEndShape();
     
-//    ofLine(0.0, 0.0, 0.0, targetDistance);
-//    ofSetCircleResolution(50);
-//    ofSetColor(0,0,0,75);
-//    ofCircle(0.0, targetDistance, targetRadius);
-//    
-//    ofSetColor(0,0,0,200);
-//    ofCircle(targetRelative.x, targetRelative.y, 10);
+    ofBeginShape();
+    ofVertex(17, 3);
+    ofVertex(20, 0);
+    ofEndShape();
     
+    ofBeginShape();
+    ofVertex(17, -3);
+    ofVertex(20, 0);
+    ofEndShape();
+    
+    ofBeginShape();
+    ofVertex(0, -15);
+    ofVertex(0, 15);
+    ofEndShape();
     ofPopMatrix();
+    ofPopStyle();
+    
+    ofPushStyle();
+    ofNoFill();
+    ofSetColor(255, 50);
+    ofDrawLine(location.x-200, location.y, location.z, location.x+200, location.y, location.z);
+    ofDrawLine(location.x, location.y-200, location.z,location.x, location.y+200, location.z);
+    ofPopStyle();
     
     
 }

@@ -7,15 +7,33 @@ void ofApp::setup(){
         nodes.push_back(newNode);
     }
     
-//    for(int i = 0; i<500; i++) {
-//        car tempV = car(ofGetWidth()/2 + ofRandom(-10,10), ofGetHeight()/2 + ofRandom(-10,10));
-//        cars.push_back(tempV);
-//    }
-
+    ofColor color;
+    color.setBrightness(150);
+    ofSetSmoothLighting(true);
+    light1.setDiffuseColor( ofFloatColor(.85, .85, .75) );
+    light1.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
+    light1.setGlobalPosition(0, 0, 600);
+    light1.enable();
+    
+    light2.setDiffuseColor( ofFloatColor(.75, .75, .85) );
+    light2.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
+    light2.setGlobalPosition(2000, 1080, 600);
+    light2.enable();
+    
+    
+    ofEnableDepthTest();
+    ofEnableAlphaBlending();
+    //glShadeModel(GL_FLAT);
     
     gui.setup();
-    gui.add(maxSpd.setup("maximum speed", 1.5, .1, 8));
+    gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
+    
+    myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    myFbo.begin();
+    ofClear(255,255,255, 0);
+    myFbo.end();
+    
     
 }
 
@@ -30,28 +48,45 @@ void ofApp::update(){
         }
     }
     
-}
-
-//--------------------------------------------------------------
-void ofApp::draw(){
+    myFbo.begin();
+    
     ofBackground(0);
+    ofEnableDepthTest();
+    ofEnableAlphaBlending();
     
-//    int frame = ofGetFrameNum();
-//    if(frame%10==0){
-//        for (int x=0; x<wide ; x+=4) {
-//            for (int y = 0; y<high; y+=4) {
-//                ofSetColor(noises[y+high*x]);
-//                ofDrawRectangle(x, y, 4, 4);
-//            }
-//        }
-//    }
-
-
     
+    ofEnableLighting();
+    light1.enable();
+    light2.enable();
+    ofSetColor(255);
     
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
         (*it).display();
     }
+    
+    ofDisableLighting();
+    ofDisableDepthTest();
+    ofDisableAlphaBlending();
+
+    myFbo.end();
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::draw(){
+    
+
+    ofSetColor(255);
+    ofDisableAlphaBlending();
+    //draw the "clean" scene on screen
+    //ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    myFbo.draw(0, 0);
+    //overlay the blur on top
+    //overlay the blurred fbo on top of the previously drawn clean scene
+    //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+    //myFbo.draw(0, 0);
+
+    
     ofFill();
     ofSetColor(200);
     for(std::vector<ofVec3f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
@@ -75,14 +110,16 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::spawn(){
 
+    int num = int(ofRandom(1, 5));
     int startNode = ofRandom(nodes.size());
-    int targetNode = ofRandom(nodes.size());
-    while (startNode==targetNode) {
-        targetNode = ofRandom(nodes.size());
+    for(int i = 0;i<num;i++){
+        int targetNode = ofRandom(nodes.size());
+        while (startNode==targetNode) {
+            targetNode = ofRandom(nodes.size());
+        }
+        cluster newCluster(nodes[startNode], nodes[targetNode]);
+        clusters.push_back(newCluster);
     }
-    cluster newCluster(nodes[startNode], nodes[targetNode]);
-    clusters.push_back(newCluster);
-    
 }
 
 

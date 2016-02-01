@@ -5,6 +5,7 @@
 #include "car.h"
 #include "cluster.h"
 
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -31,7 +32,9 @@ class ofApp : public ofBaseApp{
         ofxFloatSlider maxSpd;
         ofxFloatSlider alphaTagetAng;
     
-    vector<int> noises;
+    ofLight light1, light2;
+    
+    ofFbo myFbo;
     
     private:
     

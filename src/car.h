@@ -18,20 +18,21 @@ public:
     
     void update(int maxSpd, int alphaTagetAng);
     void wander();
-    void applyForce(ofVec2f force);
+    void applyForce(ofVec3f force);
     void arrive();
     void display();
     bool life;
-    ofVec2f location;
+    ofVec3f location;
     int leadVert;
+    ofVec3f velocity;
     
 private:
     
 
-    ofVec2f velocity;
-    ofVec2f acceleration;
-    ofVec2f targetRelative;
-    ofVec2f targetLoc;
+
+    ofVec3f acceleration;
+    ofVec3f targetRelative;
+    ofVec3f targetLoc;
     
     int high;
     float r;
@@ -44,6 +45,11 @@ private:
     float alphaTargetAngle;
     float currentTargetAngle;
     int currentVert;
+    
+    float frequency;
+    float timeFrequency;
+    float gridSize;
+    
     
 };
 

@@ -19,13 +19,20 @@ public:
     cluster(ofVec3f start, ofVec3f target);
     void update(int maxSpd, int alphaTagetAng);
     void display();
+    void setNormals(ofMesh & mesh);
     
     vector<car> cars;
     ofMesh trail;
+    
     bool life;
     ofColor col;
+    ofVec3f tint;
     
+    float frequency;
+    float timeFrequency;
+    float gridSize;
     
+    ofMaterial material;
 };
 
 #endif /* cluster_h */
