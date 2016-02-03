@@ -1,2 +1,1 @@
-ofxFboBlur
 ofxGui
