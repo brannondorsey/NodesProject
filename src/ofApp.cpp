@@ -29,6 +29,8 @@ void ofApp::setup(){
     gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
     
+    blur.setup(ofGetWidth(), ofGetHeight(), 10, .9, 10, 0.9);
+    
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();
     ofClear(255,255,255, 0);
