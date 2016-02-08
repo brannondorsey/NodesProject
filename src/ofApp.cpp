@@ -78,15 +78,20 @@ void ofApp::update(){
 void ofApp::draw(){
     
 
+    ofBackground(0);
     ofSetColor(255);
     ofDisableAlphaBlending();
-    //draw the "clean" scene on screen
-    //ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    blur.begin();
     myFbo.draw(0, 0);
-    //overlay the blur on top
-    //overlay the blurred fbo on top of the previously drawn clean scene
-    //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
-    //myFbo.draw(0, 0);
+    blur.end();
+    
+    ofSetColor(255, 255);
+    myFbo.draw(0,0);
+    ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+    blur.draw();
+    blur.draw();
+    //blur.draw();
+    ofDisableBlendMode();
 
     
     ofFill();
