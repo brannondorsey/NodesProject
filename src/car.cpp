@@ -181,7 +181,7 @@ void car::display() {
     ofNoFill();
     
     float theta = velocity.angle(ofVec3f(1,0,0));
-    float theta2 = velocity.angle(ofVec3f(0,1,0));
+    float theta2 = velocity.angle(ofVec3f(0,0,1));
     //ofFill();
     ofPushMatrix();
     ofTranslate(location.x,location.y, location.z);
@@ -190,11 +190,9 @@ void car::display() {
     
     ofPushStyle();
     ofSetColor(250,57,67,120);
-    //ofBeginShape();
-        ofSetSphereResolution(3);
-        ofDrawSphere(ofSignedNoise(location.z/10)*30);
+    ofSetSphereResolution(3);
+    ofDrawSphere(((ofSignedNoise(location.z/20)+1)*10)+1);
 
-    //ofEndShape();
     ofPopMatrix();
     ofPopStyle();
     
