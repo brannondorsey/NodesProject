@@ -14,27 +14,33 @@ class car {
 public:
     
     car() {}
-    car(ofVec3f start, ofVec3f target, int num);
+    car(ofVec3f start, ofVec3f target, ofVec3f newTint, int num);
     
     void update(int maxSpd, int alphaTagetAng);
     void wander();
     void applyForce(ofVec3f force);
     void arrive();
     void display();
+    void add();
+    void minus();
     bool life;
     ofVec3f location;
     int leadVert;
     ofVec3f velocity;
+    ofVboMesh trail;
+    bool arrived;
     
 private:
     
-
+    ofColor col;
+    ofVec3f tint;
 
     ofVec3f acceleration;
     ofVec3f targetRelative;
     ofVec3f targetLoc;
     
     int high;
+    float wide;
     float r;
     float maxforce;
     float maxspeed;

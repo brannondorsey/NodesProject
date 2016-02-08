@@ -22,15 +22,15 @@ public:
     void setNormals(ofMesh & mesh);
     
     vector<car> cars;
-    ofMesh trail;
+    
     
     bool life;
-    ofColor col;
-    ofVec3f tint;
+
     
     float frequency;
     float timeFrequency;
     float gridSize;
+    int traffic;
     
     ofMaterial material;
 };

@@ -6,7 +6,7 @@ void ofApp::setup(){
         ofVec3f newNode = ofVec3f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()), 0);
         nodes.push_back(newNode);
     }
-    
+    ofSetFrameRate(60);
     ofColor color;
     color.setBrightness(150);
     ofSetSmoothLighting(true);
@@ -26,8 +26,8 @@ void ofApp::setup(){
     //glShadeModel(GL_FLAT);
     
     gui.setup();
-    gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
-    gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
+    gui.add(maxSpd.setup("maximum speed", 3.5, .1, 8));
+    gui.add(alphaTagetAng.setup("angle change", 10, 3, 40));
     
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();

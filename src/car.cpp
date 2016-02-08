@@ -8,12 +8,13 @@
 #include "ofApp.h"
 #include "car.h"
 
-car::car(ofVec3f start, ofVec3f target, int num) {
+car::car(ofVec3f start, ofVec3f target, ofVec3f newTint, int num) {
     acceleration = ofVec3f(0,0, 0);
-    float vel = 1.25;
+    float vel = 2.25;
     velocity = ofVec3f(ofRandom(-vel, vel) ,ofRandom(-vel, vel), ofRandom(-vel, vel));
     location = start;
     targetLoc = target;
+    tint = newTint;
     r = 2.0;
     targetDistance = r * 10.0;
     targetRadius = r * 4.0;
@@ -24,54 +25,95 @@ car::car(ofVec3f start, ofVec3f target, int num) {
     arriveRadius = 10.0;
 
     life = true;
+    arrived = false;
     high = ofGetHeight();
     leadVert = (num*2)-1;
+    wide = 3;
     
-    frequency = 0.8;
-    timeFrequency = .3;
+    frequency = .7;
+    timeFrequency = .7;
     gridSize = 7.0;
+    
+    col = ofColor(255*tint.x, 255*tint.y, 255*tint.z, 150);
+    trail.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+    trail.addColor(col);
+    trail.addVertex(start);
+    trail.enableNormals();
+    trail.enableColors();
 }
 
 void car::update(int maxSpd, int alphaTagetAng) {
-    maxspeed = maxSpd;
-    alphaTargetAngle = alphaTagetAng;
-    velocity += acceleration;
-    velocity.limit(maxspeed);
-    location += velocity;
-    acceleration *= 0;
+    
+    if(!arrived){
+        maxspeed = maxSpd;
+        alphaTargetAngle = alphaTagetAng;
+        velocity += acceleration;
+        velocity.limit(maxspeed);
+        location += velocity;
+        acceleration *= 0;
+        if(trail.getNumVertices()>300) {
+            trail.removeVertex(0);
+            trail.removeColor(0);
+        }
+    }else{
+        minus();
+    }
 
+}
+
+void car::add(){
+    trail.addVertex(location);
+    //trail.addColor(col2);
+    //if(wide<10)wide+=ofRandom(-1, 1);
+    //trail.addVertex(location-velocity*velocity*wide);
+    ofSeedRandom();
+    col.r = col.r+ ofRandom(-20,20);
+    col.g = col.g + ofRandom(-15,15);
+    col.b = col.b + ofRandom(-5,5);
+    ofColor col2 = ofColor(col.r*tint.x,col.g*tint.y, col.b*tint.z, col.a*1.0 );
+    trail.addColor(col2);
+
+}
+
+void car::minus(){
+    if (trail.getNumVertices()>0) {
+        trail.removeVertex(0);
+        trail.removeColor(0);
+    }else{
+        life = false;
+    }
 }
 
 void car::wander() {
 
-    float time = ofGetElapsedTimef();
-    float noiseTime = time * timeFrequency;
+    if(!arrived){
+        float time = ofGetElapsedTimef();
+        float noiseTime = time * timeFrequency;
     
-    ofVec3f extentMin( 0, 0, gridSize*-0.5 );
-    ofVec3f extentMax( gridSize, gridSize, gridSize *  0.5 );
+        ofVec3f extentMin( 0, 0, gridSize*-0.5 );
+        ofVec3f extentMax( gridSize, gridSize, gridSize *  0.5 );
     
-    ofVec3f pos;
+        ofVec3f pos;
     
-    pos.x = ofMap( location.x,  0, 2000, extentMin.x, extentMax.x );
-    pos.y = ofMap( location.y,  0, 2000, extentMin.y, extentMax.y );
-    pos.z = ofMap( location.z,  -1000, 1000, extentMin.z, extentMax.z );
+        pos.x = ofMap( location.x,  0, 2000, extentMin.x, extentMax.x );
+        pos.y = ofMap( location.y,  0, 2000, extentMin.y, extentMax.y );
+        pos.z = ofMap( location.z,  -1000, 1000, extentMin.z, extentMax.z );
     
-    ofVec3f noisePos = pos * frequency;
+        ofVec3f noisePos = pos * frequency;
     
-    ofVec3f vel;
-    vel.x = ofSignedNoise( noisePos.x, noisePos.y, noisePos.z, noiseTime );
-    vel.y = ofSignedNoise( noiseTime,  noisePos.z, noisePos.y, noisePos.x );
-    vel.z = ofSignedNoise( noisePos.z, noiseTime,  noisePos.y, noisePos.x );
+        ofVec3f vel;
+        vel.x = ofSignedNoise( noisePos.x, noisePos.y, noisePos.z, noiseTime );
+        vel.y = ofSignedNoise( noiseTime,  noisePos.z, noisePos.y, noisePos.x );
+        vel.z = ofSignedNoise( noisePos.z, noiseTime,  noisePos.y, noisePos.x );
     
-    ofVec3f desired = vel;
+        ofVec3f desired = vel;
     
-    desired.normalize();
-    desired *= maxspeed;
-    ofVec3f steer = desired - velocity;
-    steer.limit(maxforce);
-    applyForce(steer*0.9);
-
-
+        desired.normalize();
+        desired *= maxspeed;
+        ofVec3f steer = desired - velocity;
+        steer.limit(maxforce);
+        applyForce(steer*1);
+    }
 }
 
 void car::applyForce(ofVec3f force) {
@@ -84,24 +126,58 @@ void car::applyForce(ofVec3f force) {
 
 
 void car::arrive() {
-    ofVec3f desired = targetLoc - location;
-    float d = desired.length();
-    desired.normalize();
-    if (d < arriveRadius) {
+    
+    if(!arrived){
+        ofVec3f desired = targetLoc - location;
+        float d = desired.length();
+        desired.normalize();
+        if (d < arriveRadius) {
         //float m = ofMap(d,0,arriveRadius,0,maxspeed);
         //desired *= m;
-        life = false;
-    } else {
-        desired *= maxspeed;
+            arrived = true;
+        } else {
+            desired *= maxspeed;
+        }
+        ofVec3f steer = desired - velocity;
+        steer.limit(maxforce);
+        applyForce(steer);
     }
-    ofVec3f steer = desired - velocity;
-    steer.limit(maxforce);
-    applyForce(steer);
+    
+    
+    float time = ofGetElapsedTimef();
+    float noiseTime = time * timeFrequency;
+    
+    ofVec3f extentMin( 0, 0, gridSize*-0.5 );
+    ofVec3f extentMax( gridSize, gridSize, gridSize *  0.5 );
+    
+    for (int vert = 5; vert < trail.getNumVertices(); vert++) {
+        ofVec3f tempVert = trail.getVertex(vert);
+        
+        ofVec3f pos;
+        
+        pos.x = ofMap( tempVert.x,  0, 2000, extentMin.x, extentMax.x );
+        pos.y = ofMap( tempVert.y,  0, 2000, extentMin.y, extentMax.y );
+        pos.z = ofMap( tempVert.z,  -1000, 1000, extentMin.z, extentMax.z );
+        
+        ofVec3f noisePos = pos * frequency;
+        
+        ofVec3f vel;
+        vel.x = 2*ofSignedNoise( noisePos.x, noisePos.y, noisePos.z, noiseTime )/2;
+        vel.y = 2*ofSignedNoise( noiseTime,  noisePos.z, noisePos.y, noisePos.x )/2;
+        vel.z = 2*ofSignedNoise( noisePos.z, noiseTime,  noisePos.y, noisePos.x )/2;
+        
+        tempVert+=vel;
+        
+        trail.setVertex(vert, tempVert);
+    }
 }
 
 void car::display() {
     
-
+    ofSetColor(255);
+    trail.draw();
+    
+    if(!arrived){
     ofNoFill();
     
     float theta = velocity.angle(ofVec3f(1,0,0));
@@ -109,39 +185,26 @@ void car::display() {
     //ofFill();
     ofPushMatrix();
     ofTranslate(location.x,location.y, location.z);
-    ofRotate(-theta, 0, 0, 1);
-    //ofRotate(theta2, 0, 0, 0);
+    ofRotate(-theta*3, 0, 0, 1);
+    ofRotate(theta2*10, 0, 1, 0);
     
     ofPushStyle();
-    ofSetColor(250,50,50,75);
-    ofBeginShape();
-    ofVertex(-15, 0);
-    ofVertex(20, 0);
-    ofEndShape();
-    
-    ofBeginShape();
-    ofVertex(17, 3);
-    ofVertex(20, 0);
-    ofEndShape();
-    
-    ofBeginShape();
-    ofVertex(17, -3);
-    ofVertex(20, 0);
-    ofEndShape();
-    
-    ofBeginShape();
-    ofVertex(0, -15);
-    ofVertex(0, 15);
-    ofEndShape();
+    ofSetColor(230,57,67,100);
+    //ofBeginShape();
+        ofSetSphereResolution(3);
+        ofDrawSphere(ofSignedNoise(location.z/10)*30);
+
+    //ofEndShape();
     ofPopMatrix();
     ofPopStyle();
     
     ofPushStyle();
     ofNoFill();
-    ofSetColor(255, 50);
-    ofDrawLine(location.x-200, location.y, location.z, location.x+200, location.y, location.z);
-    ofDrawLine(location.x, location.y-200, location.z,location.x, location.y+200, location.z);
+    ofSetColor(193,222, 232, 50);
+    ofDrawLine(location.x-100, location.y, location.z, location.x+100, location.y, location.z);
+    ofDrawLine(location.x, location.y-100, location.z,location.x, location.y+100, location.z);
     ofPopStyle();
+    }
     
     
 }
