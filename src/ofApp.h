@@ -4,6 +4,7 @@
 #include "ofxGui.h"
 #include "car.h"
 #include "cluster.h"
+#include "ofxBlur.h"
 
 
 class ofApp : public ofBaseApp{
@@ -35,6 +36,7 @@ class ofApp : public ofBaseApp{
     ofLight light1, light2;
     
     ofFbo myFbo;
+    ofxBlur blur;
     
     private:
     

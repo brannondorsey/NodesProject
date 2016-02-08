@@ -189,7 +189,7 @@ void car::display() {
     ofRotate(theta2*10, 0, 1, 0);
     
     ofPushStyle();
-    ofSetColor(230,57,67,100);
+    ofSetColor(250,57,67,120);
     //ofBeginShape();
         ofSetSphereResolution(3);
         ofDrawSphere(ofSignedNoise(location.z/10)*30);

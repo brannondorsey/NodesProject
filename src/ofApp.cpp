@@ -29,6 +29,8 @@ void ofApp::setup(){
     gui.add(maxSpd.setup("maximum speed", 3.5, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 10, 3, 40));
     
+    blur.setup(ofGetWidth(), ofGetHeight(), 10, .9, 10, 0.9);
+    
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();
     ofClear(255,255,255, 0);
@@ -75,16 +77,20 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-
+    ofBackground(0);
     ofSetColor(255);
     ofDisableAlphaBlending();
-    //draw the "clean" scene on screen
-    //ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    blur.begin();
     myFbo.draw(0, 0);
-    //overlay the blur on top
-    //overlay the blurred fbo on top of the previously drawn clean scene
-    //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
-    //myFbo.draw(0, 0);
+    blur.end();
+    
+    ofSetColor(255, 255);
+    myFbo.draw(0,0);
+    ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+    blur.draw();
+    blur.draw();
+    blur.draw();
+    ofDisableBlendMode();
 
     
     ofFill();

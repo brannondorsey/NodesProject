@@ -1,1 +1,2 @@
+ofxBlur
 ofxGui
