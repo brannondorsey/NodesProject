@@ -29,7 +29,7 @@ void ofApp::setup(){
     gui.add(maxSpd.setup("maximum speed", 3.5, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 10, 3, 40));
     
-    blur.setup(ofGetWidth(), ofGetHeight(), 10, .9, 10, 0.9);
+    blur.setup(ofGetWidth()/2, ofGetHeight()/2, 10, .9, 10, 0.9);
     
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();
@@ -77,19 +77,20 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    ofRectangle myBlur = ofRectangle(0, 0, ofGetWidth(), ofGetHeight());
     ofBackground(0);
     ofSetColor(255);
     ofDisableAlphaBlending();
     blur.begin();
-    myFbo.draw(0, 0);
+    myFbo.draw(0, 0, ofGetWidth()/2, ofGetHeight()/2);
     blur.end();
     
     ofSetColor(255, 255);
     myFbo.draw(0,0);
     ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-    blur.draw();
-    blur.draw();
-    blur.draw();
+    blur.draw(myBlur);
+    blur.draw(myBlur);
+    blur.draw(myBlur);
     ofDisableBlendMode();
 
     
