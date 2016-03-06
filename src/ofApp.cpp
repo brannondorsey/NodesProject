@@ -2,8 +2,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSeedRandom(88);
     for(int i = 0; i<50; i++) {
-        ofVec3f newNode = ofVec3f(ofRandom(ofGetWidth()),ofRandom(ofGetHeight()), 0);
+        ofVec3f newNode = ofVec3f(50+ofRandom(ofGetWidth()-100),ofRandom(ofGetHeight()-200), 0);
         nodes.push_back(newNode);
     }
     ofSetFrameRate(60);
