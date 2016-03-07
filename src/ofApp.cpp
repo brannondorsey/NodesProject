@@ -42,13 +42,26 @@ void ofApp::setup(){
     myFbo.end();
     
 //---------------------setup sound
-    launch.load("synth.wav");
-    launch.setMultiPlay(true);
-    launch.setVolume(.8);
-    
-    land.load("synth.wav");
-    land.setMultiPlay(true);
-    land.setVolume(.8);
+    string myPath = "launcher";
+    ofDirectory launcher (myPath);
+    launcher.listDir();
+    for (int i=0; i<launcher.size(); ++i) {
+        ofSoundPlayer launch;
+        launch.load(launcher.getPath(i));
+        launch.setMultiPlay(true);
+        launch.setVolume(.8);
+        launches.push_back(launch);
+    }
+    myPath = "lander";
+    ofDirectory lander (myPath);
+    lander.listDir();
+    for (int i=0; i<lander.size(); ++i) {
+        ofSoundPlayer land;
+        land.load(lander.getPath(i));
+        land.setMultiPlay(true);
+        land.setVolume(.8);
+        landings.push_back(land);
+    }
     
 }
 
@@ -61,7 +74,7 @@ void ofApp::update(){
     
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
         if((*it).update(maxSpd, alphaTagetAng)) {
-            land.play();
+            landings[(*it).ping].play();
             if(ofRandom(100)>95){
                 giveBack = true;
                 myTarg = (*it).target;
@@ -154,7 +167,8 @@ void ofApp::spawn(){
         }
         cluster newCluster(nodes[startNode], nodes[targetNode]);
         clusters.push_back(newCluster);
-        launch.play();
+        int whichLaunch = ofRandom(launches.size());
+        launches[whichLaunch].play();
     }
 }
 
@@ -164,7 +178,7 @@ void ofApp::respawn(ofVec3f target, ofVec3f start){
 
         cluster newCluster(target, start);
         clusters.push_back(newCluster);
-        launch.play();
+        launches[int(ofRandom(launches.size()))].play();
 }
 
 //--------------------------------------------------------------

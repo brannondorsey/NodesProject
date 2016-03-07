@@ -28,6 +28,7 @@ public:
     ofColor col;
     ofVec3f tint;
     ofVec3f start, target;
+    Byte ping;
     
     float frequency;
     float timeFrequency;

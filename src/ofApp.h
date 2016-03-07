@@ -38,8 +38,8 @@ class ofApp : public ofBaseApp{
     ofFbo myFbo;
     ofxBlur blur;
     
-    ofSoundPlayer  launch;
-    ofSoundPlayer  land;
+    vector<ofSoundPlayer> launches;
+    vector<ofSoundPlayer> landings;
     
     private:
     

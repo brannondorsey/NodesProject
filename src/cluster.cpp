@@ -11,6 +11,7 @@
 
 cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp) {
     life = true;
+    ping = Byte(ofRandom(4));
     start = startTemp;
     target = targetTemp;
     tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
