@@ -2,12 +2,14 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
+    //--------------------setup nodes
     ofSeedRandom(70);
     for(int i = 0; i<50; i++) {
         ofVec3f newNode = ofVec3f(50+ofRandom(ofGetWidth()-100),ofRandom(ofGetHeight()-200), 0);
         nodes.push_back(newNode);
     }
-    
+    //--------------------setup lighting
     ofColor color;
     color.setBrightness(150);
     ofSetSmoothLighting(true);
@@ -21,22 +23,32 @@ void ofApp::setup(){
     light2.setGlobalPosition(2000, 1080, 600);
     light2.enable();
     
-    
+    //--------------------setup GL stuff
     ofEnableDepthTest();
     ofEnableAlphaBlending();
     //glShadeModel(GL_FLAT);
     
+    //--------------------setup GUI
     gui.setup();
     gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
-    
+    //--------------------setup blur
     blur.setup(ofGetWidth()/2, ofGetHeight()/2, 10, .9, 10, 0.9);
     
+    //--------------------setup FBO
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();
     ofClear(255,255,255, 0);
     myFbo.end();
     
+    //---------------------setup sound
+    launch.load("synth.wav");
+    launch.setMultiPlay(true);
+    launch.setVolume(.8);
+    
+    land.load("synth.wav");
+    land.setMultiPlay(true);
+    land.setVolume(.8);
     
 }
 
@@ -44,7 +56,7 @@ void ofApp::setup(){
 void ofApp::update(){
     // Call the appropriate steering behaviors for our agents
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
-        (*it).update(maxSpd, alphaTagetAng);
+        if((*it).update(maxSpd, alphaTagetAng)) land.play();
         if (!(*it).life) {
             clusters.erase(it);
             --it;
@@ -72,6 +84,8 @@ void ofApp::update(){
     ofDisableAlphaBlending();
 
     myFbo.end();
+    
+    ofSoundUpdate();
     
 }
 
@@ -127,6 +141,7 @@ void ofApp::spawn(){
         }
         cluster newCluster(nodes[startNode], nodes[targetNode]);
         clusters.push_back(newCluster);
+        launch.play();
     }
 }
 

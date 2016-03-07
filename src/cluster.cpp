@@ -34,9 +34,9 @@ cluster::cluster(ofVec3f start, ofVec3f target) {
 
 }
 
-void cluster::update(int maxSpd, int alphaTagetAng) {
+bool cluster::update(int maxSpd, int alphaTagetAng) {
     int frame = ofGetFrameNum();
-    
+    bool playMe = false;
     for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).wander();
         (*it).arrive();
@@ -59,6 +59,7 @@ void cluster::update(int maxSpd, int alphaTagetAng) {
         
         if (!(*it).life) {
             cars.erase(it);
+            playMe = true;
             --it;
         }
     }
@@ -104,6 +105,7 @@ void cluster::update(int maxSpd, int alphaTagetAng) {
     }
     
     setNormals(trail);
+    return playMe;
     
 }
 

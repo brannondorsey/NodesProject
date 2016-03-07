@@ -17,7 +17,7 @@ public:
     
     cluster() {}
     cluster(ofVec3f start, ofVec3f target);
-    void update(int maxSpd, int alphaTagetAng);
+    bool update(int maxSpd, int alphaTagetAng);
     void display();
     void setNormals(ofMesh & mesh);
     
@@ -33,6 +33,8 @@ public:
     float gridSize;
     
     ofMaterial material;
+    
+
 };
 
 #endif /* cluster_h */
