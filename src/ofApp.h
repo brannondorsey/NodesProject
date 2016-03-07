@@ -47,6 +47,7 @@ class ofApp : public ofBaseApp{
         vector<ofVec3f> nodes;
         //vector<ofVec2f> targets;
         void spawn();
+    void respawn(ofVec3f start, ofVec3f target);
     
     
 		

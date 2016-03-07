@@ -9,8 +9,10 @@
 #include "cluster.h"
 #include "ofApp.h"
 
-cluster::cluster(ofVec3f start, ofVec3f target) {
+cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp) {
     life = true;
+    start = startTemp;
+    target = targetTemp;
     tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
     int traffic = ofRandom(7, 15);
     for(int i = 1; i<traffic; i++) {

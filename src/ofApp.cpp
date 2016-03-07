@@ -55,13 +55,26 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     // Call the appropriate steering behaviors for our agents
+    bool giveBack = false;
+    ofVec3f myTarg;
+    ofVec3f myStart;
+    
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
-        if((*it).update(maxSpd, alphaTagetAng)) land.play();
+        if((*it).update(maxSpd, alphaTagetAng)) {
+            land.play();
+            if(ofRandom(100)>95){
+                giveBack = true;
+                myTarg = (*it).target;
+                myStart = (*it).start;
+            }
+        }
         if (!(*it).life) {
             clusters.erase(it);
             --it;
         }
     }
+    
+    if(giveBack) respawn(myTarg, myStart);
     
     myFbo.begin();
     
@@ -146,7 +159,13 @@ void ofApp::spawn(){
 }
 
 
+//--------------------------------------------------------------
+void ofApp::respawn(ofVec3f target, ofVec3f start){
 
+        cluster newCluster(target, start);
+        clusters.push_back(newCluster);
+        launch.play();
+}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

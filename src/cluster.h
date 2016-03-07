@@ -27,6 +27,7 @@ public:
     bool life;
     ofColor col;
     ofVec3f tint;
+    ofVec3f start, target;
     
     float frequency;
     float timeFrequency;
