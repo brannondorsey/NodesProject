@@ -3,13 +3,13 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    //--------------------setup nodes
+//--------------------setup nodes
     ofSeedRandom(70);
     for(int i = 0; i<50; i++) {
         ofVec3f newNode = ofVec3f(50+ofRandom(ofGetWidth()-100),ofRandom(ofGetHeight()-200), 0);
         nodes.push_back(newNode);
     }
-    //--------------------setup lighting
+//--------------------setup lighting
     ofColor color;
     color.setBrightness(150);
     ofSetSmoothLighting(true);
@@ -23,25 +23,25 @@ void ofApp::setup(){
     light2.setGlobalPosition(2000, 1080, 600);
     light2.enable();
     
-    //--------------------setup GL stuff
+//--------------------setup GL stuff
     ofEnableDepthTest();
     ofEnableAlphaBlending();
     //glShadeModel(GL_FLAT);
     
-    //--------------------setup GUI
+//--------------------setup GUI
     gui.setup();
     gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
-    //--------------------setup blur
+//--------------------setup blur
     blur.setup(ofGetWidth()/2, ofGetHeight()/2, 10, .9, 10, 0.9);
     
-    //--------------------setup FBO
+//--------------------setup FBO
     myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     myFbo.begin();
     ofClear(255,255,255, 0);
     myFbo.end();
     
-    //---------------------setup sound
+//---------------------setup sound
     launch.load("synth.wav");
     launch.setMultiPlay(true);
     launch.setVolume(.8);
