@@ -9,8 +9,10 @@
 #include "cluster.h"
 #include "ofApp.h"
 
-cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp) {
+cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNode) {
     life = true;
+    sNode = mysNode;
+    tNode = mytNode;
     ping = Byte(ofRandom(4));
     start = startTemp;
     target = targetTemp;

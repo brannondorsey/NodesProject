@@ -40,6 +40,8 @@ class ofApp : public ofBaseApp{
     
     vector<ofSoundPlayer> launches;
     vector<ofSoundPlayer> landings;
+    int pings[50];
+    float lastTime;
     
     private:
     
@@ -47,7 +49,8 @@ class ofApp : public ofBaseApp{
         vector<ofVec3f> nodes;
         //vector<ofVec2f> targets;
         void spawn();
-    void respawn(ofVec3f start, ofVec3f target);
+    void respawn(ofVec3f start, ofVec3f target, Byte tempTarg, Byte tempStart);
+    void dotUpdates();
     
     
 		

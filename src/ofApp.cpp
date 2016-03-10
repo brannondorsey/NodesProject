@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    ofHideCursor();
 //--------------------setup nodes
     ofSeedRandom(70);
     for(int i = 0; i<50; i++) {
@@ -63,6 +64,10 @@ void ofApp::setup(){
         landings.push_back(land);
     }
     
+    for(int i = 0; i<50; i++) {
+        pings[i] = 0;
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -71,14 +76,17 @@ void ofApp::update(){
     bool giveBack = false;
     ofVec3f myTarg;
     ofVec3f myStart;
-    
+    Byte theTarg, theStart;
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
         if((*it).update(maxSpd, alphaTagetAng)) {
-            landings[(*it).ping].play();
+            //landings[(*it).ping].play();
+            if(pings[(*it).tNode] == 0) pings[(*it).tNode] = 6;
             if(ofRandom(100)>95){
                 giveBack = true;
                 myTarg = (*it).target;
                 myStart = (*it).start;
+                theTarg = (*it).tNode;
+                theStart = (*it).sNode;
             }
         }
         if (!(*it).life) {
@@ -87,7 +95,7 @@ void ofApp::update(){
         }
     }
     
-    if(giveBack) respawn(myTarg, myStart);
+    if(giveBack) respawn(myTarg, myStart, theTarg, theStart);
     
     myFbo.begin();
     
@@ -111,7 +119,18 @@ void ofApp::update(){
 
     myFbo.end();
     
-    ofSoundUpdate();
+    //ofSoundUpdate();
+    
+    float currentTime = ofGetElapsedTimeMillis();
+    if( currentTime-lastTime>65){
+        dotUpdates();
+        lastTime = ofGetElapsedTimeMillis();
+    }
+    
+    if (ofRandom(30000)>29970) {
+        spawn();
+    }
+    
     
 }
 
@@ -136,14 +155,23 @@ void ofApp::draw(){
 
     
     ofFill();
-    ofSetColor(200);
+    
     for(std::vector<ofVec3f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
-        ofDrawCircle((*it).x, (*it).y, 4);
+        if((*it).z == 1){
+            ofSetColor(250);
+            ofDrawCircle((*it).x, (*it).y, 5);
+        }else{
+            ofSetColor(0);
+            ofDrawCircle((*it).x, (*it).y, 10);
+        }
+        
     }
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 250, 15);
-
-    gui.draw();
+    //ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 250, 15);
+    //gui.draw();
+    
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -165,21 +193,39 @@ void ofApp::spawn(){
         while (startNode==targetNode) {
             targetNode = ofRandom(nodes.size());
         }
-        cluster newCluster(nodes[startNode], nodes[targetNode]);
+        cluster newCluster(nodes[startNode], nodes[targetNode], startNode,targetNode);
         clusters.push_back(newCluster);
         int whichLaunch = ofRandom(launches.size());
-        launches[whichLaunch].play();
+        //launches[whichLaunch].play();
+        pings[startNode] = 4;
     }
 }
 
 
 //--------------------------------------------------------------
-void ofApp::respawn(ofVec3f target, ofVec3f start){
+void ofApp::respawn(ofVec3f target, ofVec3f start, Byte tempTarg, Byte tempStart){
 
-        cluster newCluster(target, start);
+        cluster newCluster(target, start, tempTarg, tempStart);
         clusters.push_back(newCluster);
-        launches[int(ofRandom(launches.size()))].play();
+        //launches[int(ofRandom(launches.size()))].play();
 }
+
+//--------------------------------------------------------------
+void ofApp::dotUpdates(){
+    int myIter = 0;
+    for(std::vector<ofVec3f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
+        if (pings[myIter]>0) {
+            if((*it).z == 0){
+                (*it).z = 1;
+            }else if ((*it).z == 1){
+                (*it).z = 0;
+            }
+            pings[myIter]--;
+        }else{ (*it).z = 0;}
+        myIter++;
+    }
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

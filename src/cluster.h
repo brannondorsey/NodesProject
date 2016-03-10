@@ -16,7 +16,7 @@ class cluster {
 public:
     
     cluster() {}
-    cluster(ofVec3f start, ofVec3f target);
+    cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNode);
     bool update(int maxSpd, int alphaTagetAng);
     void display();
     void setNormals(ofMesh & mesh);
@@ -29,6 +29,7 @@ public:
     ofVec3f tint;
     ofVec3f start, target;
     Byte ping;
+    Byte sNode, tNode;
     
     float frequency;
     float timeFrequency;
