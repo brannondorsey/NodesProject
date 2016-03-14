@@ -122,7 +122,7 @@ void ofApp::update(){
     //ofSoundUpdate();
     
     float currentTime = ofGetElapsedTimeMillis();
-    if( currentTime-lastTime>65){
+    if( currentTime-lastTime>45){
         dotUpdates();
         lastTime = ofGetElapsedTimeMillis();
     }
