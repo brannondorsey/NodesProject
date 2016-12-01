@@ -4,16 +4,20 @@
 void ofApp::setup(){
     
     ofHideCursor();
+    wide = ofGetWidth();
+    high = ofGetHeight();
+
 //--------------------setup nodes
-    ofSeedRandom(70);
+    //ofSeedRandom(70);
     for(int i = 0; i<50; i++) {
-        ofVec3f newNode = ofVec3f(50+ofRandom(ofGetWidth()-100),ofRandom(ofGetHeight()-200), 0);
+        ofVec3f newNode = ofVec3f(ofRandom(wide),ofRandom(high), 0);
         nodes.push_back(newNode);
     }
 //--------------------setup lighting
     ofColor color;
     color.setBrightness(150);
     ofSetSmoothLighting(true);
+    
     light1.setDiffuseColor( ofFloatColor(.85, .85, .75) );
     light1.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
     light1.setGlobalPosition(0, 0, 600);
@@ -21,7 +25,7 @@ void ofApp::setup(){
     
     light2.setDiffuseColor( ofFloatColor(.75, .75, .85) );
     light2.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
-    light2.setGlobalPosition(2000, 1080, 600);
+    light2.setGlobalPosition(1080, 2000, 600);
     light2.enable();
     
 //--------------------setup GL stuff
@@ -34,16 +38,22 @@ void ofApp::setup(){
     gui.add(maxSpd.setup("maximum speed", 2.1, .1, 8));
     gui.add(alphaTagetAng.setup("angle change", 30, 3, 40));
 //--------------------setup blur
-    blur.setup(ofGetWidth()/2, ofGetHeight()/2, 10, .9, 10, 0.9);
+    blur.setup(wide/2, high/2, 10, .9, 10, 0.9);
     
 //--------------------setup FBO
-    myFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    myFbo.allocate(wide, high, GL_RGBA);
     myFbo.begin();
     ofClear(255,255,255, 0);
     myFbo.end();
+    targetPos = ofVec3f(wide/2, high/2, 1800);
+    startPos = targetPos;
+    cam.setGlobalPosition(targetPos);
+    cam.lookAt(ofVec3f(wide/2, high/2, 0));
+    
+    camMove = false;
     
 //---------------------setup sound
-    string myPath = "launcher";
+/*    string myPath = "launcher";
     ofDirectory launcher (myPath);
     launcher.listDir();
     for (int i=0; i<launcher.size(); ++i) {
@@ -67,11 +77,12 @@ void ofApp::setup(){
     for(int i = 0; i<50; i++) {
         pings[i] = 0;
     }
-    
+    */
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
     // Call the appropriate steering behaviors for our agents
     bool giveBack = false;
     ofVec3f myTarg;
@@ -98,7 +109,7 @@ void ofApp::update(){
     if(giveBack) respawn(myTarg, myStart, theTarg, theStart);
     
     myFbo.begin();
-    
+    cam.begin();
     ofBackground(0);
     ofEnableDepthTest();
     ofEnableAlphaBlending();
@@ -112,11 +123,22 @@ void ofApp::update(){
     for(std::vector<cluster>::iterator it = clusters.begin() ; it != clusters.end(); ++it) {
         (*it).display();
     }
-    
+    for(std::vector<ofVec3f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
+        if((*it).z == 1){
+            ofSetColor(250, 255);
+            ofDrawCircle((*it).x, (*it).y, 5);
+        }else{
+            ofSetColor(100, 255);
+            ofDrawCircle((*it).x, (*it).y, 10);
+        }
+        
+    }
+    ofSetColor(180);
+    //ofBoxPrimitive(200, 200, 200);
     ofDisableLighting();
     ofDisableDepthTest();
     ofDisableAlphaBlending();
-
+    cam.end();
     myFbo.end();
     
     //ofSoundUpdate();
@@ -131,19 +153,55 @@ void ofApp::update(){
         spawn();
     }
     
+    bool found = false;
+    if(clusters.size()>0){
+        for(int i = 0; i<clusters.size(); i++){
+            if(clusters.at(i).cars.size()>0){
+                ofVec3f camPos = clusters.at(i).leader;
+                camPos += ofVec3f(0,0,700);
+                targetPos = camPos;
+                found = true;
+                break;
+            }
+        }
+        
+        if(!found){
+            startPos = cam.getGlobalPosition();
+            targetPos = ofVec3f(wide/2, high/2, 1800);
+        }
+    }
+    
+    if(startPos.distance(targetPos)>2) camMove = true;
+    
+    if(camMove){
+        ofVec3f interPos;					//this will hold our tweened position.
+        // calculate the interpolated values.
+        interPos = startPos.interpolate(targetPos, .01);
+        cam.setGlobalPosition(interPos);
+        //startPos = targetPos;
+    }else{
+        cam.setGlobalPosition(targetPos);
+        startPos = targetPos;
+        camMove = false;
+    }
     
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    ofRectangle myBlur = ofRectangle(0, 0, 1920, 1200);
+    ofRectangle myBlur = ofRectangle(0, 0, wide/2, high/2);
     ofBackground(0);
     ofSetColor(255);
     ofDisableAlphaBlending();
     blur.begin();
-    myFbo.draw(0, 0, 960, 600);
+    myFbo.draw(0, 0, wide/2, high/2);
     blur.end();
+    
+    myBlur.scale(2, 2);
+    
+//    cout<<myBlur.width<<endl;
+//    cout<<myBlur.height<<endl;
     
     ofSetColor(255, 255);
     myFbo.draw(0,0);
@@ -156,17 +214,9 @@ void ofApp::draw(){
     
     ofFill();
     
-    for(std::vector<ofVec3f>::iterator it = nodes.begin() ; it != nodes.end(); ++it) {
-        if((*it).z == 1){
-            ofSetColor(250);
-            ofDrawCircle((*it).x, (*it).y, 5);
-        }else{
-            ofSetColor(0);
-            ofDrawCircle((*it).x, (*it).y, 10);
-        }
-        
-    }
-    ofSetColor(255);
+// flash the city
+    
+//    ofSetColor(255);
     //ofDrawBitmapString(ofToString(ofGetFrameRate())+"fps", 250, 15);
     //gui.draw();
     
@@ -195,7 +245,7 @@ void ofApp::spawn(){
         }
         cluster newCluster(nodes[startNode], nodes[targetNode], startNode,targetNode);
         clusters.push_back(newCluster);
-        int whichLaunch = ofRandom(launches.size());
+        //int whichLaunch = ofRandom(launches.size());
         //launches[whichLaunch].play();
         pings[startNode] = 4;
     }

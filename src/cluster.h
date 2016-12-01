@@ -27,7 +27,7 @@ public:
     bool life;
     ofColor col;
     ofVec3f tint;
-    ofVec3f start, target;
+    ofVec3f start, target, leader;
     Byte ping;
     Byte sNode, tNode;
     

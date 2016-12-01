@@ -37,9 +37,10 @@ class ofApp : public ofBaseApp{
     
     ofFbo myFbo;
     ofxBlur blur;
+    ofCamera cam;
+    ofVec3f targetPos, startPos;
+    bool camMove;
     
-    vector<ofSoundPlayer> launches;
-    vector<ofSoundPlayer> landings;
     int pings[50];
     float lastTime;
     

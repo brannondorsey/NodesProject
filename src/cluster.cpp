@@ -16,7 +16,8 @@ cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNo
     ping = Byte(ofRandom(4));
     start = startTemp;
     target = targetTemp;
-    tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
+    leader = ofVec3f(540, 960, 0);
+    tint = ofVec3f(ofRandom(.7,.9),ofRandom(.7,.9), ofRandom(.8, 1.0));
     int traffic = ofRandom(7, 15);
     for(int i = 1; i<traffic; i++) {
         car tempV = car(start, target, i);
@@ -29,7 +30,7 @@ cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNo
     }
     
     trail.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
-    tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
+    tint = ofVec3f(ofRandom(.6,.8),ofRandom(.6,.8), ofRandom(.7, 1.0));
     
     frequency = 0.8;
     timeFrequency = .3;
@@ -49,9 +50,9 @@ bool cluster::update(int maxSpd, int alphaTagetAng) {
         
         trail.setVertex((*it).leadVert, (*it).location);
         
-        if(frame%2==0){
+        if(frame%3==0){
             trail.addVertex((*it).location);
-            col = ofColor(ofRandom(100,255),ofRandom(100,255), ofRandom(100,255), 20);
+            col = ofColor(ofRandom(100,200),ofRandom(100,200), ofRandom(100,200), 40);
             col = ofColor(col.r*tint.x,col.g*tint.y, col.b*tint.z, col.a*1.0 );
             trail.addColor(col);
             (*it).leadVert = trail.getNumVertices()-1;
@@ -64,10 +65,13 @@ bool cluster::update(int maxSpd, int alphaTagetAng) {
         
         if (!(*it).life) {
             cars.erase(it);
-            playMe = true;
+            //playMe = true;
             --it;
         }
     }
+    
+    leader = cars[0].location;
+    
     if (cars.size()<1) {
         if (trail.getNumVertices()>0) {
             trail.removeVertex(0);
@@ -110,7 +114,7 @@ bool cluster::update(int maxSpd, int alphaTagetAng) {
     }
     
     setNormals(trail);
-    return playMe;
+    //return playMe;
     
 }
 

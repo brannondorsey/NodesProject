@@ -21,7 +21,7 @@ car::car(ofVec3f start, ofVec3f target, int num) {
     targetRelative = ofVec3f(0,0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
     maxspeed = 4.0;
     maxforce = ofRandom(.02,.1);
-    arriveRadius = 10.0;
+    arriveRadius = 15.0;
 
     life = true;
     high = ofGetHeight();
