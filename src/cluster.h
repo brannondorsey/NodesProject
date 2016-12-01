@@ -12,24 +12,24 @@
 #include "ofMain.h"
 #include "car.h"
 
-class cluster {
+class Cluster {
 public:
     
-    cluster() {}
-    cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNode);
+    Cluster() {}
+    Cluster(ofVec3f startTemp, ofVec3f targetTemp, BYTE mysNode, BYTE mytNode);
     bool update(int maxSpd, int alphaTagetAng);
     void display();
     void setNormals(ofMesh & mesh);
     
-    vector<car> cars;
+    vector<Car> cars;
     ofMesh trail;
     
     bool life;
     ofColor col;
     ofVec3f tint;
-    ofVec3f start, target;
-    Byte ping;
-    Byte sNode, tNode;
+    ofVec3f start, target, leader;
+    BYTE ping;
+    BYTE sNode, tNode;
     
     float frequency;
     float timeFrequency;

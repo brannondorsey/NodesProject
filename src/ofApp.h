@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxGui.h"
 #include "car.h"
 #include "cluster.h"
 #include "ofxBlur.h"
@@ -29,27 +28,24 @@ class ofApp : public ofBaseApp{
     int wide;
     int high;
     
-        ofxPanel gui;
-        ofxFloatSlider maxSpd;
-        ofxFloatSlider alphaTagetAng;
-    
     ofLight light1, light2;
     
     ofFbo myFbo;
     ofxBlur blur;
+    ofCamera cam;
+    ofVec3f targetPos, startPos;
+    bool camMove;
     
-    vector<ofSoundPlayer> launches;
-    vector<ofSoundPlayer> landings;
     int pings[50];
     float lastTime;
     
     private:
     
-        vector<cluster> clusters;
+        vector<Cluster> clusters;
         vector<ofVec3f> nodes;
         //vector<ofVec2f> targets;
         void spawn();
-    void respawn(ofVec3f start, ofVec3f target, Byte tempTarg, Byte tempStart);
+    void respawn(ofVec3f start, ofVec3f target, BYTE tempTarg, BYTE tempStart);
     void dotUpdates();
     
     

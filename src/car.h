@@ -10,11 +10,11 @@
 
 #include "ofMain.h"
 
-class car {
+class Car {
 public:
     
-    car() {}
-    car(ofVec3f start, ofVec3f target, int num);
+    Car() {}
+    Car(ofVec3f start, ofVec3f target, int num);
     
     void update(int maxSpd, int alphaTagetAng);
     void wander();

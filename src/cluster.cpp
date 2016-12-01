@@ -9,17 +9,18 @@
 #include "cluster.h"
 #include "ofApp.h"
 
-cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNode) {
+Cluster::Cluster(ofVec3f startTemp, ofVec3f targetTemp, BYTE mysNode, BYTE mytNode) {
     life = true;
     sNode = mysNode;
     tNode = mytNode;
-    ping = Byte(ofRandom(4));
+    ping = BYTE(ofRandom(4));
     start = startTemp;
     target = targetTemp;
-    tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
-    int traffic = ofRandom(7, 15);
+    leader = ofVec3f(540, 960, 0);
+    tint = ofVec3f(ofRandom(.7,.9),ofRandom(.7,.9), ofRandom(.8, 1.0));
+    int traffic = ofRandom(5, 10);
     for(int i = 1; i<traffic; i++) {
-        car tempV = car(start, target, i);
+        Car tempV = Car(start, target, i);
         cars.push_back(tempV);
         trail.addVertex(start);
         trail.addColor(ofColor(255*tint.x, 255*tint.y, 255*tint.z, 20));
@@ -29,7 +30,7 @@ cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNo
     }
     
     trail.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
-    tint = ofVec3f(ofRandom(.8,1.0),ofRandom(.8,1.0), ofRandom(.8, 1.0));
+    tint = ofVec3f(ofRandom(.6,.8),ofRandom(.6,.8), ofRandom(.7, 1.0));
     
     frequency = 0.8;
     timeFrequency = .3;
@@ -39,35 +40,32 @@ cluster::cluster(ofVec3f startTemp, ofVec3f targetTemp, Byte mysNode, Byte mytNo
 
 }
 
-bool cluster::update(int maxSpd, int alphaTagetAng) {
+bool Cluster::update(int maxSpd, int alphaTagetAng) {
     int frame = ofGetFrameNum();
     bool playMe = false;
-    for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
-        (*it).wander();
-        (*it).arrive();
-        (*it).update(maxSpd, alphaTagetAng);
-        
-        trail.setVertex((*it).leadVert, (*it).location);
-        
-        if(frame%2==0){
-            trail.addVertex((*it).location);
-            col = ofColor(ofRandom(100,255),ofRandom(100,255), ofRandom(100,255), 20);
-            col = ofColor(col.r*tint.x,col.g*tint.y, col.b*tint.z, col.a*1.0 );
-            trail.addColor(col);
-            (*it).leadVert = trail.getNumVertices()-1;
-        }
-        if(trail.getNumVertices()>2500) {
-            trail.removeVertex(0);
-            trail.removeColor(0);
-        }
-        
-        
-        if (!(*it).life) {
-            cars.erase(it);
-            playMe = true;
-            --it;
-        }
-    }
+	cars.erase(std::remove_if(cars.begin(), cars.end(), [&](Car & car) {
+		car.wander();
+		car.arrive();
+		car.update(maxSpd, alphaTagetAng);
+		trail.setVertex(car.leadVert, car.location);
+		if (frame % 3 == 0) {
+			trail.addVertex(car.location);
+			col = ofColor(ofRandom(100, 200), ofRandom(100, 200), ofRandom(100, 200), 40);
+			col = ofColor(col.r*tint.x, col.g*tint.y, col.b*tint.z, col.a*1.0);
+			trail.addColor(col);
+			car.leadVert = trail.getNumVertices() - 1;
+		}
+		if (trail.getNumVertices()>1000) {
+			trail.removeVertex(0);
+			trail.removeColor(0);
+		}
+		return !car.life;
+	}), cars.end());
+ 
+	if (cars.size() > 0) {
+		leader = cars[0].location;
+	}
+    
     if (cars.size()<1) {
         if (trail.getNumVertices()>0) {
             trail.removeVertex(0);
@@ -88,7 +86,7 @@ bool cluster::update(int maxSpd, int alphaTagetAng) {
     ofVec3f extentMax( gridSize, gridSize, gridSize *  0.5 );
     
     
-    for (int vert = 100; vert < trail.getNumVertices(); vert++) {
+    for (int vert = 3; vert < trail.getNumVertices(); vert++) {
         ofVec3f tempVert = trail.getVertex(vert);
         
         ofVec3f pos;
@@ -114,10 +112,10 @@ bool cluster::update(int maxSpd, int alphaTagetAng) {
     
 }
 
-void cluster::display(){
+void Cluster::display(){
     
     ofSetColor(255);
-    for(std::vector<car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
+    for(std::vector<Car>::iterator it = cars.begin() ; it != cars.end(); ++it) {
         (*it).display();
         //carDisplay(*it);
     }
@@ -131,7 +129,7 @@ void cluster::display(){
 
 //--------------------------------------------------------------
 //Universal function which sets normals for the triangle mesh
-void cluster::setNormals( ofMesh &mesh ){
+void Cluster::setNormals( ofMesh &mesh ){
     
     //The number of the vertices
     int nV = mesh.getNumVertices();

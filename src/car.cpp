@@ -8,9 +8,9 @@
 #include "ofApp.h"
 #include "car.h"
 
-car::car(ofVec3f start, ofVec3f target, int num) {
+Car::Car(ofVec3f start, ofVec3f target, int num) {
     acceleration = ofVec3f(0,0, 0);
-    float vel = 1.25;
+    float vel = 1.5;
     velocity = ofVec3f(ofRandom(-vel, vel) ,ofRandom(-vel, vel), ofRandom(-vel, vel));
     location = start;
     targetLoc = target;
@@ -21,18 +21,18 @@ car::car(ofVec3f start, ofVec3f target, int num) {
     targetRelative = ofVec3f(0,0,0);  // similar to 'desired' vector in other examples, position of target relative to vehicle
     maxspeed = 4.0;
     maxforce = ofRandom(.02,.1);
-    arriveRadius = 10.0;
+    arriveRadius = 15.0;
 
     life = true;
     high = ofGetHeight();
     leadVert = (num*2)-1;
     
     frequency = 0.8;
-    timeFrequency = .3;
+    timeFrequency = ofRandom(.15,.45);
     gridSize = 7.0;
 }
 
-void car::update(int maxSpd, int alphaTagetAng) {
+void Car::update(int maxSpd, int alphaTagetAng) {
     maxspeed = maxSpd;
     alphaTargetAngle = alphaTagetAng;
     velocity += acceleration;
@@ -42,7 +42,7 @@ void car::update(int maxSpd, int alphaTagetAng) {
 
 }
 
-void car::wander() {
+void Car::wander() {
 
     float time = ofGetElapsedTimef();
     float noiseTime = time * timeFrequency;
@@ -74,7 +74,7 @@ void car::wander() {
 
 }
 
-void car::applyForce(ofVec3f force) {
+void Car::applyForce(ofVec3f force) {
     // We could add mass here if we want A = F / M
     acceleration+=force;
 }
@@ -83,7 +83,7 @@ void car::applyForce(ofVec3f force) {
 // STEER = DESIRED MINUS VELOCITY
 
 
-void car::arrive() {
+void Car::arrive() {
     ofVec3f desired = targetLoc - location;
     float d = desired.length();
     desired.normalize();
@@ -99,7 +99,7 @@ void car::arrive() {
     applyForce(steer);
 }
 
-void car::display() {
+void Car::display() {
     
 
     ofNoFill();
